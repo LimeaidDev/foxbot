@@ -315,7 +315,7 @@ def run():
             message = discord.ui.TextInput(
                 style=discord.TextStyle.long,
                 label="Prompt",
-                max_length=100,
+                max_length=300,
                 required=False,
                 default=default,
                 placeholder="Input a prompt"
