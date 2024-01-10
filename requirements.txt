@@ -65,3 +65,4 @@ you-get==0.4.1650
 youtube-dl==2021.12.17
 yt-dlp==2023.12.30
 ytmusicapi==1.4.1
+nextcord
