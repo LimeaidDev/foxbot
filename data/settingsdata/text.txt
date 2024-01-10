@@ -1,0 +1,147 @@
+Help
+clearlogs - clears info logs
+setbottemp <value> - Sets the bot temperature from 0-2
+[INFO] Bot already started
+[INFO] Stopping Runtime
+[INFO] Bot isn't running
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Starting Runtime
+[INFO] Bot already started
+[INFO] Stopping Runtime
+[INFO] Starting Runtime
+[INFO] Stopping Runtime
+[INFO] Starting Runtime
+[INFO] Stopping Runtime
+[INFO] Starting Runtime
+[INFO] Bot already started
+[INFO] Stopping Runtime
+[INFO] Starting Runtime
+[INFO] Bot already started
+[INFO] Stopping Runtime
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Bot isn't running
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from Polly
+[INFO] Starting Runtime
+[INFO] Connected to Polly
+[INFO] Stopping Runtime
+[INFO] Disconnected from poly
+[INFO] Bot isn't running
+[INFO] Starting Runtime
+[INFO] Connected to poly
+[INFO] Stopping Runtime
+[INFO] Disconnected from poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[INFO] Connected to poly
+[ERROR] Invalid Bot key provided. Please check Bot token
