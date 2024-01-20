@@ -224,7 +224,7 @@ def run():
                 model=model.name,
                 prompt=prompt,
                 size="1024x1024",
-                quality="hd",
+                quality="standard",
                 n=1,
             )
             # Remove loading message
@@ -512,7 +512,7 @@ def run():
                                     model="dall-e-3",
                                     prompt=prompt,
                                     size="1024x1024",
-                                    quality="hd",
+                                    quality="standard",
                                     n=1,
                                 )
                                 # Remove loading message
