@@ -265,21 +265,24 @@ def run():
                 await interaction.channel.send(f"*Original message was deleted*\nAn error occurred ```{traceback.format_exc()}```")
     @bot.tree.command(name="mock", description="Make it seem like another user said something")
     async def mock(interaction: discord.Interaction, user:discord.Member, text:str):
-        webhooks = await interaction.channel.webhooks()
-        webhook = discord.utils.get(webhooks, name=f"foxbot")
-        if webhook is None:
-            webhook = await interaction.channel.create_webhook(name=f"foxbot")
-        await interaction.response.send_message("Mock message sent", ephemeral=True)
-        await webhook.send(text, username=user.display_name, avatar_url='{}'.format(user.avatar))
+        await interaction.response.send_message("This feature is tempraraly disabled", ephemeral=False)
+        
+        # webhooks = await interaction.channel.webhooks()
+        # webhook = discord.utils.get(webhooks, name=f"foxbot")
+        # if webhook is None:
+        #    webhook = await interaction.channel.create_webhook(name=f"foxbot")
+        # await interaction.response.send_message("Mock message sent", ephemeral=True)
+        # await webhook.send(text, username=user.display_name, avatar_url='{}'.format(user.avatar))
 
     @bot.tree.command(name="anon", description="Anonymously send a message")
     async def anon(interaction: discord.Interaction, text: str):
-        webhooks = await interaction.channel.webhooks()
-        webhook = discord.utils.get(webhooks, name=f"foxbot")
-        if webhook is None:
-            webhook = await interaction.channel.create_webhook(name=f"foxbot")
-        await interaction.response.send_message("Anonymous message sent", ephemeral=True)
-        await webhook.send(text, username="Anonymous", avatar_url="https://sandstormit.com/wp-content/uploads/2021/06/incognito-2231825_960_720-1.png")
+        await interaction.response.send_message("This feature is tempraraly disabled", ephemeral=False)
+        # webhooks = await interaction.channel.webhooks()
+        # webhook = discord.utils.get(webhooks, name=f"foxbot")
+        # if webhook is None:
+        #    webhook = await interaction.channel.create_webhook(name=f"foxbot")
+        # await interaction.response.send_message("Anonymous message sent", ephemeral=True)
+        # await webhook.send(text, username="Anonymous", avatar_url="https://sandstormit.com/wp-content/uploads/2021/06/incognito-2231825_960_720-1.png")
 
     @bot.tree.command(name='rps', description="Play Rock Paper Scissors with a CPU")
     @app_commands.describe(choice="Choose Rock, Paper, Or Scissors")
