@@ -491,6 +491,7 @@ def run():
                             arguments = json.loads(response['choices'][0]['message']['tool_calls'][0]['function']['arguments'])
                             prompt = arguments['prompt']
                             imageresponse = arguments['response']
+                            print(arguments)
                             with open("data/chatlogdata/" + str(message.channel.id), "rb") as f:
                                 chat_log = pkl.load(f)
 
