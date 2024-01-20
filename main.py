@@ -148,7 +148,7 @@ def run():
     bot = commands.Bot(command_prefix="f!", intents=discord.Intents.all())
     @bot.event
     async def on_ready():
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(client.guilds)} Servers"))
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} Servers"))
         print("foxbot is up!")
         try:
             synced = await bot.tree.sync()
@@ -179,7 +179,7 @@ def run():
     
     @bot.tree.command(name="servers", description="Say hello to your furry friend")
     async def servers(interaction: discord.Interaction):
-        await interaction.response.send_message(f"I'm in **{len(client.guilds)}** servers", ephemeral=False)
+        await interaction.response.send_message(f"I'm in **{len(bot.guilds)}** servers", ephemeral=False)
 
     @bot.tree.command(name="hello", description="Say hello to your furry friend")
     async def hello(interaction: discord.Interaction):
