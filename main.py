@@ -39,7 +39,7 @@ def run():
             "type": "function",
             "function": {
                 "name": "imagine_in_conv",
-                "description": "makes images when users ask for one or want to add on too a current one. For example someone can ask for 'an image of a fox' and then later ask 'give him a scarf' which you then adjust the prompt accordingly",
+                "description": "makes images when users ask for one or want to add on too a current one. For example someone can ask for 'an image of a fox' and then later ask 'give him a scarf' which you then adjust the prompt accordingly. Be sure to distinguish wether the user is contiuing the conversation or asking for modifications so that you dont make an image a user doesnt want",
                 "parameters": {
                     "type": "object",
                     "properties": {
