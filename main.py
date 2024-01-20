@@ -512,9 +512,8 @@ def run():
                                 try:
                                     await message.channel.send(content=f"""# {prompt}""", files=[discord.File(f'{message.author.id}1conv.png')], reference=message)
                                 except:
-                                    await message.channel.send(content=f"""# {prompt}""",
+                                    await message.channel.send(content=f"""{imageresponse}""",
                                                                files=[discord.File(f'{message.author.id}1conv.png')])
-                                    await message.channel.send(content=f"{imageresponse}")
 
                             except openai.error.InvalidRequestError:
                                 await message.channel.send(content=f"""This prompt was rejected.""")
