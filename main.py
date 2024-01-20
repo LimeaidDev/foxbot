@@ -259,7 +259,8 @@ def run():
             os.remove(f'{interaction.user.id}vari4.png')
         except:
             try:
-                await interaction.followup.send(content=f"An error occurred ```{traceback.format_exc()}```")
+                await interaction.followup.send(content=f"Sorry, that was on us 😅. Use /feedback if this keeps happening")
+                recenterror = traceback.format_exc()
             except:
                 await interaction.channel.send(f"*Original message was deleted*\nAn error occurred ```{traceback.format_exc()}```")
     @bot.tree.command(name="mock", description="Make it seem like another user said something")
@@ -527,7 +528,10 @@ def run():
                                 await message.channel.send(assisstant_response.strip("\n").strip())
                         except:
                             try:
-                                await message.channel.send("Sorry, that was on us 😅. Use /feedback if this keeps happening", reference=message)
+                                await message.channel.send(f"""Sorry, that was on us 😅. Use /feedback if this keeps happening
+                                for the devs:
+                                ```{traceback.format_exc()}```""", reference=message)
+                                recenterror = traceback.format_exc()
                             except:
                                 await message.channel.send(f"*Replying to {message.author.display_name}: {user_message}*\n\nSorry, that was on us 😅. Use /feedback if this keeps happening")
                             print(response['choices'][0]['message']['tool_calls'][0]['function']['arguments'])
