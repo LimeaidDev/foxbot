@@ -46,9 +46,13 @@ def run():
                         "prompt": {
                             "type": "string",
                             "description": "a description of an image the user wants",
+                        },
+                        "response": {
+                            "type": "string",
+                            "description": "What you would say after making the image"
                         }
                     },
-                    "required": ["prompt"],
+                    "required": ["prompt", "response"],
                 },
             }
         }
@@ -485,11 +489,14 @@ def run():
                                 waittext = await message.channel.send("*making image...*")
                             arguments = json.loads(response['choices'][0]['message']['tool_calls'][0]['function']['arguments'])
                             prompt = arguments['prompt']
+                            imageresponse = argumets['response']
                             with open("data/chatlogdata/" + str(message.channel.id), "rb") as f:
                                 chat_log = pkl.load(f)
 
                             chat_log.append({"role": "user",
                                              "content": f"({formatted_date_time}) System: {message.author.display_name} talked to foxbot to generat a image of {prompt}"})
+                            chat_log.append({"role": "user",
+                                             "content": f"{imageresponse}"})
                             try:
                                 response = await openai.Image.acreate(
                                     model="dall-e-3",
@@ -506,6 +513,7 @@ def run():
                                 except:
                                     await message.channel.send(content=f"""# {prompt}""",
                                                                files=[discord.File(f'{message.author.id}1conv.png')])
+                                    await message.channel.send(content=f"{imageresponse}")
 
                             except openai.error.InvalidRequestError:
                                 await message.channel.send(content=f"""This prompt was rejected.""")
