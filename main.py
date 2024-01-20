@@ -511,7 +511,7 @@ def run():
                                 urllib.request.urlretrieve(response["data"][0]["url"], f'{message.author.id}1conv.png')
                                 await waittext.delete()
                                 try:
-                                    await message.channel.send(content=f"""# {prompt}""", files=[discord.File(f'{message.author.id}1conv.png')], reference=message)
+                                    await message.channel.send(content=f"""{imageresponse}""", files=[discord.File(f'{message.author.id}1conv.png')], reference=message)
                                 except:
                                     await message.channel.send(content=f"""{imageresponse}""",
                                                                files=[discord.File(f'{message.author.id}1conv.png')])
