@@ -176,6 +176,10 @@ def run():
             os.remove(f'{message.author.id}1conv.png')
         except openai.error.InvalidRequestError:
             await message.channel.send(content=f"""This prompt was rejected.""")
+    
+    @bot.tree.command(name="servers", description="Say hello to your furry friend")
+    async def servers(interaction: discord.Interaction):
+        await interaction.response.send_message(f"I'm in **{len(client.guilds)}** servers", ephemeral=False)
 
     @bot.tree.command(name="hello", description="Say hello to your furry friend")
     async def hello(interaction: discord.Interaction):
