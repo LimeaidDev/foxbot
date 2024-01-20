@@ -148,6 +148,7 @@ def run():
     bot = commands.Bot(command_prefix="f!", intents=discord.Intents.all())
     @bot.event
     async def on_ready():
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(client.guilds)} Servers"))
         print("foxbot is up!")
         try:
             synced = await bot.tree.sync()
