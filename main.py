@@ -490,7 +490,7 @@ def run():
                                 waittext = await message.channel.send("*making image...*")
                             arguments = json.loads(response['choices'][0]['message']['tool_calls'][0]['function']['arguments'])
                             prompt = arguments['prompt']
-                            imageresponse = argumets['response']
+                            imageresponse = arguments['response']
                             with open("data/chatlogdata/" + str(message.channel.id), "rb") as f:
                                 chat_log = pkl.load(f)
 
