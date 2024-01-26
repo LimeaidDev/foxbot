@@ -1,42 +1,32 @@
 import json
 import random
-import sys
 import traceback
 import time
-
 import values
 import discord
 from discord.ext import commands
 from discord import app_commands
-
 import datetime
 import openai
 import urllib
-import ffmpeg
-import wavelinkcord as wavelink
-import asyncio
 import pickle as pkl
 import os
 import psycopg2
 
-#openai bullshit
+# openai bullshit
 GPT_API_KEY = open("secrets/GPT_API_KEY", "r").read()
 openai.api_key = GPT_API_KEY
 global chat_log
 chat_log = []
 
-#music bullshit
-
-#pegging options
-ffmpeg_options = {'options': '-vn'}
-
-#database stuff
 
 
+# i dont know how to variable
 global presys_message
 
 global settingslist
 
+# main loop
 def run():
     tools = [
         {
@@ -61,6 +51,7 @@ def run():
             }
         }
     ]
+    # refreshes settings while bot is running so users can change settings in real time
     def settingsrefresh():
         global temp
         global model
@@ -74,25 +65,28 @@ def run():
         admins = [
             1020563958781984788
         ]
-
+    # Updates and preps the system prompt with new info so the bot is aware of its suroundings
     def systemrefresh(ServerName, ServerOwner, ChannelName, ChannelTopic, username, userid):
         global chat_log
         global presys_message
-        #systemfile = str(open("data/settingsdata/system").read())
-        #if os.path.isfile(f"data/systems/{userid}"):
-            #userprompt = str(open(f"data/systems/{userid}").read())
-        #else:
-            #userprompt = str(open(f"data/systems/polly.txt").read())
+        # Outdated data saving from a darker time
+        # systemfile = str(open("data/settingsdata/system").read())
+        # if os.path.isfile(f"data/systems/{userid}"):
+            # userprompt = str(open(f"data/systems/{userid}").read())
+        # else:
+            # userprompt = str(open(f"data/systems/polly.txt").read())
         conn = psycopg2.connect(host="kashin.db.elephantsql.com", dbname="hustfxta", user="hustfxta",
                                 password="lRntwmDTkAUNU-CsYTqKgFYsujLv_2X-", port=5432)
         cur = conn.cursor()
 
-        cur.execute("""SELECT * FROM system_prompts WHERE serverid = %s """, userid)
+        cur.execute("""SELECT * FROM system_prompts WHERE serverid = %s; """, [str(userid)])
 
-        if cur.fetchone() is None:
+        promptfetch = cur.fetchone()
+
+        if promptfetch is None:
             userprompt = ""
         else:
-            userprompt = cur.fetchone()[2]
+            userprompt = promptfetch[1]
         cur.close()
         presys_message = rf"""{userprompt}
 
@@ -118,7 +112,7 @@ def run():
         sys_message = {"role": "system", "content": presys_message}
         chat_log.insert(0, sys_message)
         print(chat_log)
-
+    # outdated from when you could dm the bot, might remove
     def systemrefreshdm(Username, userid):
         systemfile = str(open("data/settingsdata/system").read())
         if os.path.isfile(f"data/systems/{userid}"):
@@ -162,9 +156,11 @@ def run():
 
     bot = commands.Bot(command_prefix="f!", intents=discord.Intents.all())
     @bot.event
+    # What happens when the bot starts
     async def on_ready():
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} Servers"))
         print("foxbot is up!")
+        # syncing commands
         try:
             synced = await bot.tree.sync()
             print(f"Synced {len(synced)}")
@@ -175,31 +171,33 @@ def run():
             print(guild.name)
             print(f"ID: {guild.id}")
 
-    @bot.event
-    async def imagine_in_conv(message, prompt: str):
-        try:
-            response = await openai.Image.acreate(
-                model="dall-e-3",
-                prompt=prompt,
-                size="1024x1024",
-                quality="hd",
-                n=1,
-            )
-            # Remove loading message
-            urllib.request.urlretrieve(response["data"][0]["url"], f'{message.author.id}1conv.png')
-            await message.channel.send(content=f"""# {prompt}""", files=[discord.File(f'{message.author.id}1conv.png')])
-            os.remove(f'{message.author.id}1conv.png')
-        except openai.error.InvalidRequestError:
-            await message.channel.send(content=f"""This prompt was rejected.""")
-    
-    @bot.tree.command(name="servers", description="Say hello to your furry friend")
+    @bot.tree.command(name="changelog", description="Shows changes in diffrent versions")
+    @app_commands.choices(version=[
+        discord.app_commands.Choice(name='Prerelese 1', value=1)])
+    async def changelog(interaction: discord.Interaction, version: discord.app_commands.Choice[int]):
+        if version.value == 1:
+            embed = discord.Embed(title="Foxbot Prerelese 1",
+                                  description="""**Begining of version tracking**\n
+                                  **New Updates**
+                                  * Added /changelog
+                                   * Shows changes for each version\n
+                                  **Fixes**
+                                  * System prompts are now store on a server keeping settings the same even when code is updated""")
+            await interaction.response.send_message(
+                embed=embed, ephemeral=True)
+
+
+    # How popular is foxbot
+    @bot.tree.command(name="servers", description="Shows number of servers")
     async def servers(interaction: discord.Interaction):
         await interaction.response.send_message(f"I'm in **{len(bot.guilds)}** servers", ephemeral=False)
 
+    # Test if the bot is alive
     @bot.tree.command(name="hello", description="Say hello to your furry friend")
     async def hello(interaction: discord.Interaction):
         await interaction.response.send_message("hey there", ephemeral=True)
 
+    # i guess you could use foxbot to timeout a user but litrealy any other bot can do that
     @bot.tree.command(name='timeout', description="Timeout a user for a specific amount of time")
     async def timeout(interaction: discord.Interaction, member: discord.Member, days: int = 0, hours: int = 0, minutes: int = 0, seconds: int = 30):
         try:
@@ -220,12 +218,12 @@ def run():
                 f"⛔ You are missing the required permissions to use this command", ephemeral=True)
         except:
             await interaction.followup.send(content=f"An error occurred ```{traceback.format_exc()}```")
-
+    # pulls a random image from a website
     @bot.tree.command(name='randomimage', description="Pulls a random image from the web")
     async def randomimage(interaction: discord.Interaction, width: int = 1920, height: int = 1080):
         urllib.request.urlretrieve(f"https://random.imagecdn.app/{width}/{height}", "random.png")
         await interaction.response.send_message(file=discord.File("random.png"), ephemeral=False)
-
+    # have an algorithm spit out fresh plagiarism
     @bot.tree.command(name='imagine', description="Uses machine learning models to generate images")
     @app_commands.describe(model="Choose a image generation model")
     @app_commands.choices(model=[
@@ -339,12 +337,14 @@ def run():
                                 password="lRntwmDTkAUNU-CsYTqKgFYsujLv_2X-", port=5432)
         cur = conn.cursor()
 
-        cur.execute("""SELECT * FROM system_prompts WHERE serverid = %s """, interaction.guild.id)
+        cur.execute("""SELECT * FROM system_prompts WHERE serverid = %s; """, [str(interaction.guild.id)])
 
-        if cur.fetchone() is None:
-            default = None
+        promptfetch = cur.fetchone()
+        print(promptfetch)
+        if promptfetch is None:
+            default = ""
         else:
-            default = cur.fetchone()[2]
+            default = promptfetch[1]
         cur.close()
         #if os.path.isfile(f"data/systems/{interaction.guild.id}"):
             #default = str(open(f"data/systems/{interaction.guild.id}").read())
@@ -365,10 +365,14 @@ def run():
                     conn = psycopg2.connect(host="kashin.db.elephantsql.com", dbname="hustfxta", user="hustfxta",
                                             password="lRntwmDTkAUNU-CsYTqKgFYsujLv_2X-", port=5432)
                     cur = conn.cursor()
+                    print(interaction.guild.id)
+                    print(self.message.value)
+                    print(cur.mogrify("""INSERT INTO system_prompts (serverid, prompt) VALUES (%s, %s); """,
+                                      (str(interaction.guild.id), self.message.value)))
 
-                    cur.execute("""DELETE FROM system_prompts WHERE serverid = %s """, interaction.guild.id)
-                    cur.execute("""INSERT INTO system_prompts (serverid, prompt)
-VALUES (%s, %s); """, (interaction.guild.id, self.message.value))
+                    cur.execute("""DELETE FROM system_prompts WHERE serverid = %s; """, [str(interaction.guild.id)])
+                    cur.execute("""INSERT INTO system_prompts (serverid, prompt) VALUES (%s, %s); """, (str(interaction.guild.id), self.message.value))
+                    conn.commit()
                     cur.close()
 
                     #if len(self.message.value) > 0:
