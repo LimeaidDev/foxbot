@@ -17,6 +17,7 @@ import wavelinkcord as wavelink
 import asyncio
 import pickle as pkl
 import os
+import psycopg2
 
 #openai bullshit
 GPT_API_KEY = open("secrets/GPT_API_KEY", "r").read()
@@ -28,6 +29,9 @@ chat_log = []
 
 #pegging options
 ffmpeg_options = {'options': '-vn'}
+
+#database stuff
+
 
 global presys_message
 
@@ -74,11 +78,22 @@ def run():
     def systemrefresh(ServerName, ServerOwner, ChannelName, ChannelTopic, username, userid):
         global chat_log
         global presys_message
-        systemfile = str(open("data/settingsdata/system").read())
-        if os.path.isfile(f"data/systems/{userid}"):
-            userprompt = str(open(f"data/systems/{userid}").read())
+        #systemfile = str(open("data/settingsdata/system").read())
+        #if os.path.isfile(f"data/systems/{userid}"):
+            #userprompt = str(open(f"data/systems/{userid}").read())
+        #else:
+            #userprompt = str(open(f"data/systems/polly.txt").read())
+        conn = psycopg2.connect(host="kashin.db.elephantsql.com", dbname="hustfxta", user="hustfxta",
+                                password="lRntwmDTkAUNU-CsYTqKgFYsujLv_2X-", port=5432)
+        cur = conn.cursor()
+
+        cur.execute("""SELECT * FROM system_prompts WHERE serverid = %s """, userid)
+
+        if cur.fetchone() is None:
+            userprompt = ""
         else:
-            userprompt = str(open(f"data/systems/polly.txt").read())
+            userprompt = cur.fetchone()[2]
+        cur.close()
         presys_message = rf"""{userprompt}
 
 
@@ -320,10 +335,21 @@ def run():
 
     @bot.tree.command(name='chatbotsystem', description="Chnage the system prompt of the chatbot")
     async def chatsys(interaction: discord.Interaction):
-        if os.path.isfile(f"data/systems/{interaction.guild.id}"):
-            default = str(open(f"data/systems/{interaction.guild.id}").read())
+        conn = psycopg2.connect(host="kashin.db.elephantsql.com", dbname="hustfxta", user="hustfxta",
+                                password="lRntwmDTkAUNU-CsYTqKgFYsujLv_2X-", port=5432)
+        cur = conn.cursor()
+
+        cur.execute("""SELECT * FROM system_prompts WHERE serverid = %s """, interaction.guild.id)
+
+        if cur.fetchone() is None:
+            default = None
         else:
-            default = ""
+            default = cur.fetchone()[2]
+        cur.close()
+        #if os.path.isfile(f"data/systems/{interaction.guild.id}"):
+            #default = str(open(f"data/systems/{interaction.guild.id}").read())
+        #else:
+            #default = ""
         class SystemModal(discord.ui.Modal, title="Chatbot System Prompt"):
             message = discord.ui.TextInput(
                 style=discord.TextStyle.long,
@@ -336,18 +362,27 @@ def run():
 
             async def on_submit(self, interaction: discord.Interaction):
                 if interaction.user.guild_permissions.moderate_members:
-                    if len(self.message.value) > 0:
-                        file = open(f"data/systems/{interaction.guild.id}", "w+")
-                        file.write(self.message.value)
-                        await interaction.response.send_message(
-                            f"Prompt Updated",
-                            ephemeral=True, delete_after=3)
-                    else:
-                        if os.path.isfile(f"data/systems/{interaction.guild.id}"):
-                            os.remove(f"data/systems/{interaction.guild.id}")
-                        await interaction.response.send_message(
-                            f"Prompt Updated",
-                            ephemeral=True, delete_after=3)
+                    conn = psycopg2.connect(host="kashin.db.elephantsql.com", dbname="hustfxta", user="hustfxta",
+                                            password="lRntwmDTkAUNU-CsYTqKgFYsujLv_2X-", port=5432)
+                    cur = conn.cursor()
+
+                    cur.execute("""DELETE FROM system_prompts WHERE serverid = %s """, interaction.guild.id)
+                    cur.execute("""INSERT INTO system_prompts (serverid, prompt)
+VALUES (%s, %s); """, (interaction.guild.id, self.message.value))
+                    cur.close()
+
+                    #if len(self.message.value) > 0:
+                       #file = open(f"data/systems/{interaction.guild.id}", "w+")
+                        #file.write(self.message.value)
+                    await interaction.response.send_message(
+                        f"Prompt Updated",
+                        ephemeral=True, delete_after=3)
+                    #else:
+                        #if os.path.isfile(f"data/systems/{interaction.guild.id}"):
+                            #os.remove(f"data/systems/{interaction.guild.id}")
+                        #await interaction.response.send_message(
+                            #f"Prompt Updated",
+                            #ephemeral=True, delete_after=3)
 
         if interaction.user.guild_permissions.moderate_members:
             system_modal = SystemModal()
