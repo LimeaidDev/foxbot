@@ -525,7 +525,8 @@ def run():
                         model=model,
                         messages=chat_log,
                         temperature=temp,
-                        tools=tools
+                        tools=tools,
+                        max_tokens=25
                     )
 
                     del chat_log[0]
