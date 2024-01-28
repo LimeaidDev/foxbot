@@ -173,7 +173,7 @@ def run():
 
     @bot.tree.command(name="changelog", description="Shows changes in diffrent versions")
     @app_commands.choices(version=[
-        discord.app_commands.Choice(name='Prerelese 1', value=1)])
+        discord.app_commands.Choice(name='Prerelese 1', value=1), discord.app_commands.Choice(name='Prerelese 2', value=2)])
     async def changelog(interaction: discord.Interaction, version: discord.app_commands.Choice[int]):
         if version.value == 1:
             embed = discord.Embed(title="Foxbot Prerelese 1",
@@ -183,6 +183,13 @@ def run():
                                    * Shows changes for each version\n
                                   **Fixes**
                                   * System prompts are now store on a server keeping settings the same even when code is updated""")
+            await interaction.response.send_message(
+                embed=embed, ephemeral=True)
+        if version.value == 2:
+            embed = discord.Embed(title="Foxbot Prerelese 2",
+                                  description="""
+                                  **New Updates**
+                                  * Set max chatbot response tokens to 25""")
             await interaction.response.send_message(
                 embed=embed, ephemeral=True)
 
