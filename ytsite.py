@@ -6,7 +6,7 @@ app = Flask(__name__)
 @app.route('/dwnld/<filename>')
 def view_file(filename):
 
-    filepath = f'./data/imgtemp/{filename}.mp4'
+    filepath = f'./data/imgtemp/fox_{filename}.mp4'
 
     if os.path.exists(filepath):
         return send_file(filepath)
