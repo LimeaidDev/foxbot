@@ -337,7 +337,7 @@ def run():
         video = YouTubeVideo(url, uniqueid)
         await video.download_video()
         try:
-            await interaction.followup.send(f"https://foxbot-348a8a887878.herokuapp.com/dwnld/fox_{uniqueid}")
+            await interaction.followup.send(f"https://www.foxthing.xyz/dwnld/fox_{uniqueid}\n**Don't trust links from foxbot that arn't foxthing.xyz**")
         except:
             await interaction.followup.send("An error occurred")
 
