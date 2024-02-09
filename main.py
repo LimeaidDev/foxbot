@@ -317,7 +317,7 @@ def run():
                 try:
                     yt = YouTube(self.givenUrl)
                     video = yt.streams.filter(progressive='True').desc().first()
-                    video.download("./data/imgtemp", filename_prefix="fox_", filename=f"{self.v_id}.mp4")
+                    video.download("data/imgtemp", filename_prefix="fox_", filename=f"{self.v_id}.mp4")
                 except RegexMatchError as urlWrong:
                     await interaction.followup.send("Invalid URL")
                 except pytube.exceptions.AgeRestrictedError:
