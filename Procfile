@@ -1,2 +1,2 @@
 Bot: python main.py
-ytServer: gunicorn ytsite:app
+web: gunicorn ytsite:app
