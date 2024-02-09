@@ -68,3 +68,4 @@ ytmusicapi==1.4.1
 psycopg2
 flask
 waitress
+gunicorn
