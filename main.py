@@ -1,7 +1,12 @@
+import asyncio
 import json
+import math
 import random
 import traceback
 import time
+
+import pytube.exceptions
+
 import values
 import discord
 from discord.ext import commands
@@ -12,6 +17,11 @@ import urllib
 import pickle as pkl
 import os
 import psycopg2
+import requests
+import string
+from pytube import YouTube
+from pytube.exceptions import RegexMatchError
+from zipfile import ZipFile
 
 # openai bullshit
 GPT_API_KEY = open("secrets/GPT_API_KEY", "r").read()
@@ -49,7 +59,7 @@ def run():
                     "required": ["prompt", "response"],
                 },
             }
-        }
+        },
     ]
     # refreshes settings while bot is running so users can change settings in real time
     def settingsrefresh():
@@ -98,6 +108,7 @@ def run():
     - Format text using markdown.
 
     Information about your environment:
+     - Your name is foxbot
      - The server you are in is called: {ServerName}
      - The server is owned by: {ServerOwner}
      - The channel you are in is called: #{ChannelName}
@@ -158,7 +169,9 @@ def run():
     @bot.event
     # What happens when the bot starts
     async def on_ready():
+        global uptimestamp
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} Servers"))
+        uptimestamp = time.time()
         print("foxbot is up!")
         # syncing commands
         try:
@@ -173,7 +186,10 @@ def run():
 
     @bot.tree.command(name="changelog", description="Shows changes in diffrent versions")
     @app_commands.choices(version=[
-        discord.app_commands.Choice(name='Prerelese 1', value=1), discord.app_commands.Choice(name='Prerelese 2', value=2)])
+        discord.app_commands.Choice(name='Prerelese 1', value=1),
+        discord.app_commands.Choice(name='Prerelese 2', value=2),
+        discord.app_commands.Choice(name='Prerelese 3', value=3)]
+    )
     async def changelog(interaction: discord.Interaction, version: discord.app_commands.Choice[int]):
         if version.value == 1:
             embed = discord.Embed(title="Foxbot Prerelese 1",
@@ -192,7 +208,156 @@ def run():
                                   * Set max chatbot response tokens to 25""")
             await interaction.response.send_message(
                 embed=embed, ephemeral=True)
+        if version.value == 3:
+            embed = discord.Embed(title="Foxbot Prerelese 3",
+                                  description="""
+                                  **New Updates**
+                                  * Added /meme
+                                   * Pulls a random meme template from imgflip\n
+                                  * Added /weather
+                                   * Show the weather for the users inputted location\n
+                                  **Fixes**
+                                  * Fixed /feedback
+                                   * Feedback can now be sent and be seen by devs. Users will now be given a unique feedback ID. If you have a ugent problem with foxbot, contact @limeadetv with your feedback ID.\n""")
+            await interaction.response.send_message(
+                embed=embed, ephemeral=True)
 
+    @bot.tree.command(name="ping", description="Ping the bot")
+    async def ping(interaction: discord.Interaction):
+        # Establishing a connection to the database
+        conn = psycopg2.connect(host="kashin.db.elephantsql.com", dbname="hustfxta", user="hustfxta",
+                                password="lRntwmDTkAUNU-CsYTqKgFYsujLv_2X-", port=5432)
+
+        # Creating a cursor object
+        cur = conn.cursor()
+
+        # Function to test latency
+        start_time = time.time()
+        cur.execute("SELECT 1")  # Simple query to test latency
+        fetch_time = time.time()
+        dblatency = math.ceil(fetch_time - start_time)
+
+        conn.close()
+        dislatency = round(bot.latency * 1000)
+
+        embed = discord.Embed(title=f"Pong!",
+                              description=f"")
+        embed.add_field(name=f"Bot Started",
+                        value=f"<t:{round(uptimestamp)}:R>", inline=True)
+        embed.add_field(name=f"Discord Latency",
+                        value=f"{dislatency}ms", inline=True)
+        embed.add_field(name=f"Database Latency",
+                        value=f"{dblatency}ms", inline=True)
+        await interaction.response.send_message(embed=embed, ephemeral=False)
+    timerusers = []
+    @bot.tree.command(name="timer", description="Make a timer")
+    async def timer(interaction: discord.Interaction, hours: int = 0,
+                      minutes: int = 0, seconds: int = 30):
+        if interaction.user.name in timerusers:
+            await interaction.response.send_message(f"You already have a timer running", delete_after=3)
+        else:
+            timerusers.append(interaction.user.name)
+            timeamount = seconds + (minutes * 60) + (hours * 3600)
+
+            starttime = round(time.time())
+            endtime = starttime + timeamount
+            await interaction.response.send_message(f"I'll mention you <t:{endtime}:R>", delete_after=3)
+            await asyncio.sleep(timeamount)
+            await interaction.channel.send(f"{interaction.user.mention} Times up!")
+            timerusers.remove(interaction.user.name)
+
+
+    @bot.tree.command(name="test", description="For testing experimental code")
+    async def test(interaction: discord.Interaction, script: str):
+        if script == "stopwatch_test":
+            deletebutton = discord.ui.Button(label="STOP", style=discord.ButtonStyle.danger)
+            timer = 0
+            await interaction.response.send_message(timer)
+            while True:
+                view = discord.ui.View()
+                view.add_item(deletebutton)
+                async def delete_button_callback(interaction):
+                    await interaction.response.edit_message(content="Stopwatch Stopped", delete_after=1)
+                await asyncio.sleep(1)
+                timer = timer + 1
+                await interaction.edit_original_response(content=timer, view=view)
+                deletebutton.callback = delete_button_callback
+        if script == "30sectimer":
+            starttime = round(time.time())
+            endtime = starttime + 30
+            await interaction.response.send_message(f"I'll mention you <t:{endtime}:R>", delete_after=3)
+            await asyncio.sleep(30)
+            await interaction.channel.send(f"{interaction.user.mention} Times up!")
+
+
+
+    @bot.tree.command(name="meme", description="Pulls a random meme from imgflip")
+    async def meme(interaction: discord.Interaction):
+        await interaction.response.defer()
+        memeapi = requests.get("https://api.imgflip.com/get_memes?")
+        memeimg = memeapi.json()['data']['memes'][random.randint(1, 100)]['url']
+        await interaction.followup.send(memeimg)
+
+    #stuff cool
+
+    @bot.tree.command(name="ytdownload", description="Download your favorite YouTube videos without getting a virus :D")
+    async def ytdownload(interaction:discord.Interaction, url: str):
+        await interaction.response.defer()
+
+        def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+            return ''.join(random.choice(chars) for _ in range(size))
+        uniqueid = id_generator(8, string.hexdigits)
+
+        class YouTubeVideo:
+            def __init__(self, givenUrl, v_id):
+                self.givenUrl = givenUrl
+                self.v_id = v_id
+
+            async def download_video(self):
+                try:
+                    yt = YouTube(self.givenUrl)
+                    video = yt.streams.filter(progressive='True').desc().first()
+                    video.download("./data/imgtemp", filename_prefix="fox_", filename=f"{self.v_id}.mp4")
+                except RegexMatchError as urlWrong:
+                    await interaction.followup.send("Invalid URL")
+                except pytube.exceptions.AgeRestrictedError:
+                    await interaction.followup.send("This content is age restricted and can't be accessed")
+
+
+        video = YouTubeVideo(url, uniqueid)
+        await video.download_video()
+        try:
+            await interaction.followup.send(f"https://foxbot-348a8a887878.herokuapp.com/dwnld/fox_{uniqueid}")
+        except:
+            await interaction.followup.send("An error occurred")
+
+        await asyncio.sleep(20)
+        os.remove(f"./data/imgtemp/fox_{uniqueid}.mp4")
+
+
+
+    @bot.tree.command(name="weather", description="Look up the weather in a location")
+    async def weather(interaction: discord.Interaction, location: str):
+        await interaction.response.defer()
+        try:
+            weatherapi = requests.get(f'http://api.weatherapi.com/v1/current.json?key=a03f08e90a404938898171059243001&q={location}&aqi=no')
+            wname = weatherapi.json()['location']['name']
+            wregion = weatherapi.json()['location']['region']
+            wtempf = weatherapi.json()['current']['temp_f']
+            wtempc = weatherapi.json()['current']['temp_c']
+            wcon = weatherapi.json()['current']['condition']['text']
+            wconimg = weatherapi.json()['current']['condition']['icon']
+
+            embed = discord.Embed(title=f"{wname}, {wregion}",
+                                  description=f"")
+            embed.add_field(name=f"{wtempf} °F / {wtempc} °C",
+                               value=f"", inline=False)
+            embed.add_field(name=f"{wcon}",
+                            value=f"", inline=False)
+            embed.set_thumbnail(url=f"https:{wconimg}")
+            await interaction.followup.send(embed=embed, ephemeral=True)
+        except:
+            await interaction.followup.send(f'Failed to get weather for **"{location}"**', ephemeral=True)
 
     # How popular is foxbot
     @bot.tree.command(name="servers", description="Shows number of servers")
@@ -461,14 +626,20 @@ def run():
         )
 
         async def on_submit(self, interaction: discord.Interaction):
-            channel = interaction.guild.get_channel(1178673345663881276)
+            def randomword(length):
+                letters = string.hexdigits
+                return ''.join(random.choice(letters) for i in range(length))
+            fbtoken = randomword(7)
 
-            embed = discord.Embed(title="New Feedback", description=f"**{self.fb_title.value}**\n\n{self.message.value}\n\n")
+            conn = psycopg2.connect(host="kashin.db.elephantsql.com", dbname="hustfxta", user="hustfxta",
+                                    password="lRntwmDTkAUNU-CsYTqKgFYsujLv_2X-", port=5432)
+            cur = conn.cursor()
+            cur.execute("INSERT INTO feedback (userid, fb_title, fb_message) VALUES (%s, %s, %s); ", [fbtoken, self.fb_title.value, self.message.value])
+            conn.commit()
+            cur.close()
+            await interaction.user.send(f'''Your feedback id is **{fbtoken}**''')
+            await interaction.response.send_message('Thanks for your feedback!', ephemeral=True)
 
-            embed.set_author(name=f'@{interaction.user}')
-
-            await interaction.response.send_message(f"Thank you, {interaction.user.display_name}. We will try to look into this", ephemeral=True)
-            await interaction.guild.get_channel(1178673345663881276).send(embed=embed)
 
 
 
@@ -487,6 +658,7 @@ def run():
 
     @bot.event
     async def on_message(message):
+        match = ['suicide', 'kms', 'kys', 'kill your self', 'kill my self', 'stop breathing', 'end my life', 'cut myself']
         if not message.author.bot:
             if bot.user in message.mentions or message.content.lower() == "hey poly" or str(
                     message.channel.type) == "private" and not message.author.bot:
@@ -533,7 +705,7 @@ def run():
                         messages=chat_log,
                         temperature=temp,
                         tools=tools,
-                        max_tokens=25
+                        max_tokens=150
                     )
 
                     del chat_log[0]
@@ -579,8 +751,25 @@ def run():
                         try:
                             try:
                                 await message.channel.send(assisstant_response.strip("\n").strip(), reference=message)
+                                if any(c in message.content for c in match):
+                                    embed = discord.Embed(title=f"Help is available",
+                                                          description=f"If you're struggling, please reach out to someone you trust or contact the Suicide Prevention Hotline")
+                                    embed.add_field(name=f"Suicide Hotline",
+                                                    value=f"Call 988", inline=True)
+                                    embed.add_field(name=f"More Help",
+                                                    value=f"[988lifeline Official Website](<https://988lifeline.org/?utm_source=google&utm_medium=web&utm_campaign=onebox>)", inline=True)
+                                    await message.channel.send(embed=embed)
+
                             except:
                                 await message.channel.send(assisstant_response.strip("\n").strip())
+                                if any(c in message.content for c in match):
+                                    embed = discord.Embed(title=f"Help is available",
+                                                          description=f"If you're struggling, please reach out to someone you trust or contact the Suicide Prevention Hotline")
+                                    embed.add_field(name=f"Suicide Hotline",
+                                                    value=f"Call 988", inline=True)
+                                    embed.add_field(name=f"More Help",
+                                                    value=f"[988lifeline Official Website](<https://988lifeline.org/?utm_source=google&utm_medium=web&utm_campaign=onebox>)", inline=True)
+                                    await message.channel.send(embed=embed)
                         except:
                             try:
                                 await message.channel.send(f"""Sorry, that was on us 😅. Use /feedback if this keeps happening
