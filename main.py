@@ -330,8 +330,6 @@ def run():
             await interaction.followup.send(f"https://foxbot-348a8a887878.herokuapp.com/dwnld/fox_{uniqueid}")
         except:
             await interaction.followup.send("An error occurred")
-            
-        os.remove(f"./data/imgtemp/fox_{uniqueid}.mp4")
 
 
 
