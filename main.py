@@ -315,7 +315,7 @@ def run():
 
         def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
             return ''.join(random.choice(chars) for _ in range(size))
-        uniqueid = id_generator(8, string.hexdigits)
+        uniqueid = id_generator(14, string.hexdigits)
 
         class YouTubeVideo:
             def __init__(self, givenUrl, v_id):
@@ -326,8 +326,10 @@ def run():
                 try:
                     yt = YouTube(self.givenUrl)
                     video = yt.streams.filter(progressive='True').desc().first()
+                    title = yt.streams.filter(progressive='True').desc().first().title
                     video.download("./data/imgtemp", filename_prefix="fox_", filename=f"{self.v_id}.mp4")
                     s3.upload_file(Bucket='bucketeer-e38e36d5-84e1-4f15-ab16-7ce5be54dc9d', Key=f'ytdown/fox_{self.v_id}.mp4', Filename=f"./data/imgtemp/fox_{self.v_id}.mp4")
+                    return title
                 except RegexMatchError as urlWrong:
                     await interaction.followup.send("Invalid URL")
                 except pytube.exceptions.AgeRestrictedError:
@@ -335,13 +337,11 @@ def run():
 
 
         video = YouTubeVideo(url, uniqueid)
-        await video.download_video()
+        vidtitle = await video.download_video()
         try:
-            await interaction.followup.send(f"https://www.foxthing.xyz/dwnld/fox_{uniqueid}\n**Don't trust links from foxbot that arn't foxthing.xyz**")
+            await interaction.followup.send(f"**{vidtitle}**\nhttps://www.foxthing.xyz/dwnld/fox_{uniqueid}\n**Don't trust links from foxbot that arn't foxthing.xyz**")
         except:
             await interaction.followup.send("An error occurred")
-
-        os.remove(f"./data/imgtemp/fox_{uniqueid}.mp4")
 
 
 
