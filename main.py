@@ -21,7 +21,16 @@ import requests
 import string
 from pytube import YouTube
 from pytube.exceptions import RegexMatchError
-from zipfile import ZipFile
+import boto3
+
+session = boto3.session.Session()
+
+s3 = session.client(
+    service_name='s3',
+    aws_access_key_id="AKIAX7CRDYXPSUB7J2O3",
+    aws_secret_access_key="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",
+    region_name="us-east-1"
+)
 
 # openai bullshit
 GPT_API_KEY = open("secrets/GPT_API_KEY", "r").read()
@@ -317,7 +326,8 @@ def run():
                 try:
                     yt = YouTube(self.givenUrl)
                     video = yt.streams.filter(progressive='True').desc().first()
-                    video.download("data/imgtemp", filename_prefix="fox_", filename=f"{self.v_id}.mp4")
+                    video.download("./data/imgtemp", filename_prefix="fox_", filename=f"{self.v_id}.mp4")
+                    s3.upload_file(Bucket='bucketeer-e38e36d5-84e1-4f15-ab16-7ce5be54dc9d', Key=f'ytdown/fox_{self.v_id}.mp4', Filename=f"./data/imgtemp/fox_{self.v_id}.mp4")
                 except RegexMatchError as urlWrong:
                     await interaction.followup.send("Invalid URL")
                 except pytube.exceptions.AgeRestrictedError:
@@ -330,6 +340,8 @@ def run():
             await interaction.followup.send(f"https://foxbot-348a8a887878.herokuapp.com/dwnld/fox_{uniqueid}")
         except:
             await interaction.followup.send("An error occurred")
+
+        os.remove(f"./data/imgtemp/fox_{uniqueid}.mp4")
 
 
 
