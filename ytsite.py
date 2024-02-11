@@ -1,5 +1,5 @@
 import flask
-from flask import Flask, send_file, request, jsonify
+from flask import Flask, send_file, request, jsonify, render_template
 import os
 import boto3
 import pytube
@@ -23,6 +23,11 @@ s3 = session.client(
     aws_secret_access_key="cJ1p5yuwUTJUxqmfS1i3j9ZYYIh29+ot2X6RhXpX",
     region_name="us-east-1"
 )
+
+@app.route('/')
+def home():
+    return render_template('front.html')
+    
 
 @app.route('/dwnld/<filename>')
 def view_file(filename):
