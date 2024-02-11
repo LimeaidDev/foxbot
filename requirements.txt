@@ -70,3 +70,4 @@ flask
 waitress
 boto3==1.34.38
 gunicorn
+asgiref==3.7.2
