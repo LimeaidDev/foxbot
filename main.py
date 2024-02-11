@@ -710,7 +710,7 @@ def run():
                     sys_message = {"role": "system", "content": presys_message}
                     chat_log.insert(0, sys_message)
                     response = await openai.ChatCompletion.acreate(
-                        model="gpt-4",
+                        model="gpt-4-0125-preview",
                         messages=chat_log,
                         temperature=temp,
                         tools=tools,
