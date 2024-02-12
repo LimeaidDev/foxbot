@@ -36,7 +36,7 @@ def view_file(filename):
     try:
         s3.download_file(Bucket='bucketeer-e38e36d5-84e1-4f15-ab16-7ce5be54dc9d', Key=f'ytdown/{filename}.mp4',
                        Filename=f"./data/imgtemp/{filename}.mp4")
-        return send_file(filepath)
+        return send_file(filepath, as_attachment=True)
 
 
     except:
