@@ -714,7 +714,7 @@ def run():
                         messages=chat_log,
                         temperature=temp,
                         tools=tools,
-                        max_tokens=150
+                        max_tokens=30
                     )
 
                     del chat_log[0]
