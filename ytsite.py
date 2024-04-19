@@ -24,6 +24,28 @@ s3 = session.client(
     region_name="us-east-1"
 )
 
+def delete_bucket_contents(bucket_name):
+    # List all objects in the bucket
+    objects_to_delete = []
+    response = s3.list_objects_v2(Bucket=bucket_name)
+    if 'Contents' in response:
+        for obj in response['Contents']:
+            objects_to_delete.append({'Key': obj['Key']})
+    
+    # Delete all objects in the bucket
+    if len(objects_to_delete) > 0:
+        s3.delete_objects(
+            Bucket=bucket_name,
+            Delete={
+                'Objects': objects_to_delete
+            }
+        )
+        print("All objects deleted from the bucket.")
+    else:
+        print("Bucket is already empty.")
+
+delete_bucket_contents("bucketeer-e38e36d5-84e1-4f15-ab16-7ce5be54dc9d")
+
 @app.route('/')
 def home():
     return render_template('front.html')
