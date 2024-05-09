@@ -95,14 +95,12 @@ class YouTubeVideo:
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
-@app.route('/watch', methods=['GET', 'POST'])
-async def watch():
-
-
+@app.route('/<path:ytroute>', methods=['GET', 'POST'])
+def downloader(ytroute):
     uniqueid = id_generator(14, string.hexdigits)
 
     try:
-        video = YouTubeVideo(f'https://www.youtube.com/watch?v={request.args["v"]}', uniqueid)
+        video = YouTubeVideo(f'{ytroute}', uniqueid)
 
         arg1, arg2 = await video.download_video()
         if arg2 == 400:
@@ -111,7 +109,7 @@ async def watch():
             return flask.redirect(f"/dwnld/fox_{uniqueid}")
     except:
         return flask.render_template_string("An error occurred"), 404
-
+        
 if __name__ == '__main__':
     # app.run(debug=True)
     from waitress import serve
