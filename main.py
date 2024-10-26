@@ -477,7 +477,7 @@ def run():
         discord.app_commands.Choice(name='Rock', value=1),
         discord.app_commands.Choice(name='Paper', value=2),
         discord.app_commands.Choice(name='Scissors', value=3)])
-    async def imagine(interaction: discord.Interaction, choice: discord.app_commands.Choice[int]):
+    async def rps(interaction: discord.Interaction, choice: discord.app_commands.Choice[int]):
         cpu = random.choice(['Rock', 'Paper', 'Scissors'])
         def is_win(player, opponent):
             if (player == 'Rock' and opponent == 'Scissors') or (player == 'Scissors' and opponent == "Paper") or (
